@@ -1,7 +1,7 @@
 /*
 Package reactLog is reaction middleware for standard log.
 
-Typical usage:
+Basic usage:
 	reactLogger := reactLog.New(os.Stderr)
 	reactLogger.AddReaction("INFO", &reactLog.Discard{})
 
@@ -10,6 +10,19 @@ Typical usage:
 	log.PrintLn("INFO this will not be written")
 	log.PrintLn("ERROR this will be written")
 
+reactLog concept is to filter and add additional functionality
+to log messages based on trigger words.
+If used in main package it enchance log globally with the use of log.SetOutput method.
+Any number of trigger words can be registered using AddReaction
+method each with it's own Reactor.
+
+Reactor is the interface that wraps the Reaction method.
+reactLog comes with few types that already implements Reactor interface:
+ Discard for discarding log messages.
+ Redirect to redirect log messages to other io.Writer.
+ Copy to write log message both to underlying io.Writer and additional io.Writer.
+
+See Examples for more info.
 */
 package reactLog
 
@@ -77,8 +90,8 @@ type Reactor interface {
 	Reaction(logLine []byte) (passOut bool, err error)
 }
 
-// AddReaction add's reaction to be executed when trigger word
-// is encounterd in log line.
+// AddReaction adds reaction to be executed when trigger
+// word is encountered in log line.
 func (l *Logger) AddReaction(triggerWord string, reaction Reactor) {
 	l.reactors[triggerWord] = reaction
 }
