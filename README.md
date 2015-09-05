@@ -1,7 +1,7 @@
 # reactLog
 Package reactLog is reaction middleware for standard golang log.
 
-[![Build Status](https://travis-ci.org/MatejB/reactLog.svg)](https://travis-ci.org/MatejB/reactLog)
+[![Build Status](https://travis-ci.org/MatejB/reactLog.svg)](https://travis-ci.org/MatejB/reactLog) [![Code Coverage](http://gocover.io/_badge/gopkg.in/reactLog)](http://gocover.io/gopkg.in/reactLog)
 
 Basic usage:
 <pre>
