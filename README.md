@@ -27,6 +27,7 @@ reactLog comes with few types that already implements Reactor interface:
 * Discard for discarding log messages.
 * Redirect to redirect log messages to other io.Writer.
 * Copy to write log message both to underlying io.Writer and additional io.Writer.
+
 Feel free to create Reactors for you specific use case by implementing Reactor interface.
 
 See [Documentation](https://godoc.org/github.com/MatejB/reactLog) for more info.
