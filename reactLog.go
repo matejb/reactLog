@@ -3,16 +3,18 @@ Package reactLog is reaction middleware for standard log.
 
 Basic usage:
 	reactLogger := reactLog.New(os.Stderr)
-	reactLogger.AddReaction("INFO", &reactLog.Discard{})
+
+    copyBuf := &bytes.Buffer{}
+	reactLogger.AddReaction("user ID 85", &reactLog.Copy{copyBuf})
 
 	log.SetOutput(reactLogger)
 
-	log.PrintLn("INFO this will not be written")
-	log.PrintLn("ERROR this will be written")
+	log.PrintLn("This is regular log message")
+	log.PrintLn("This error message concers user ID 85 and will be copied to copyBuf.")
 
 reactLog concept is to filter and add additional functionality
-to log messages based on trigger words.
-If used in main package it enchance log globally with the use of log.SetOutput method.
+to log messages based on trigger found in log message.
+If used in main package it enhance log globally with the use of log.SetOutput method.
 Any number of trigger words can be registered using AddReaction
 method each with it's own Reactor.
 
@@ -21,13 +23,13 @@ reactLog comes with few types that already implements Reactor interface:
  Discard for discarding log messages.
  Redirect to redirect log messages to other io.Writer.
  Copy to write log message both to underlying io.Writer and additional io.Writer.
+Feel free to create Reactors for you specific use case by implementing Reactor interface.
 
 See Examples for more info.
 */
 package reactLog
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 )
@@ -47,33 +49,29 @@ func New(out io.Writer) *Logger {
 }
 
 func (l *Logger) Write(p []byte) (n int, err error) {
-	analyseBuf := &bytes.Buffer{}
-	n, err = analyseBuf.Write(p)
-	if err != nil {
-		return
-	}
-
-	scanner := bufio.NewScanner(analyseBuf)
-
-	scanner.Split(bufio.ScanWords)
-
-	word := ""
-	for scanner.Scan() {
-		word = scanner.Text()
-		if reactor, ok := l.reactors[word]; ok {
-			output, err := reactor.Reaction(p)
-			if err != nil {
-				return 0, err
-			}
-			if output {
-				n, err = l.out.Write(p)
-			}
-			return n, nil
+allTriggers:
+	for key := range l.reactors {
+		trigger := []byte(key)
+		if len(trigger) > len(p) {
+			continue allTriggers
 		}
-	}
 
-	if err := scanner.Err(); err != nil {
-		return n, err
+		// find start
+		maxPos := len(p) - len(trigger) + 2
+		for i := 0; i < maxPos; i = i + 1 {
+			if p[i] == trigger[0] {
+				if bytes.Equal(p[i:i+len(trigger)], trigger) {
+					output, err := l.reactors[key].Reaction(p)
+					if err != nil {
+						return 0, err
+					}
+					if output {
+						n, err = l.out.Write(p)
+					}
+					return n, nil
+				}
+			}
+		}
 	}
 
 	// default behaviour
@@ -90,15 +88,16 @@ type Reactor interface {
 	Reaction(logLine []byte) (passOut bool, err error)
 }
 
-// AddReaction adds reaction to be executed when trigger
-// word is encountered in log line.
-func (l *Logger) AddReaction(triggerWord string, reaction Reactor) {
-	l.reactors[triggerWord] = reaction
+// AddReaction adds reaction to be executed when
+// trigger is encountered in log line.
+func (l *Logger) AddReaction(trigger string, reaction Reactor) {
+	l.reactors[trigger] = reaction
 }
 
 // Discard type implements Reactor with discard functionality.
 type Discard struct{}
 
+// Reaction is to disacard log if trigger is found
 func (d *Discard) Reaction(logLine []byte) (passOut bool, err error) {
 	return false, nil
 }
@@ -109,6 +108,7 @@ type Redirect struct {
 	Out io.Writer
 }
 
+// Reaction is to redirect log to other writer if trigger is found
 func (r *Redirect) Reaction(logLine []byte) (passOut bool, err error) {
 	_, err = r.Out.Write(logLine)
 	return false, err
@@ -120,6 +120,7 @@ type Copy struct {
 	Out io.Writer
 }
 
+// Reaction is to copy log to other writer if trigger is found
 func (c *Copy) Reaction(logLine []byte) (passOut bool, err error) {
 	_, err = c.Out.Write(logLine)
 	return true, err
