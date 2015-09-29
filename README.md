@@ -18,7 +18,9 @@ log.PrintLn("This error message concers user ID 85 and will be copied to copyBuf
 
 reactLog concept is to filter and add additional functionality to log
 based on log message content.
+
 If used in main package it enhance log globally with the use of log.SetOutput method.
+
 Any number of trigger words can be registered using AddReaction
 method each with it's own Reactor.
 
