@@ -24,36 +24,36 @@ func ExampleRedirect() {
 	logContainerForUser107 := &bytes.Buffer{} // it can be any io.Writer eq. file
 
 	reactLogger := reactLog.New(ioutil.Discard) // use os.Stderr for default log functionality
-	reactLogger.AddReaction("USER_107", &reactLog.Redirect{logContainerForUser107})
+	reactLogger.AddReaction("user ID 107", &reactLog.Redirect{logContainerForUser107})
 
 	logger := log.New(reactLogger, "", 0)
 
 	logger.Println("INFO dummy log 1")
 	logger.Println("ERROR dummy log 2")
 
-	logger.Println("Log concerning USER_107 with extra data")
+	logger.Println("Log concerning user ID 107 with extra data")
 
 	logger.Println("INFO dummy log 3")
 	logger.Println("ERROR dummy log 4")
 
 	fmt.Println(logContainerForUser107)
-	// Output: Log concerning USER_107 with extra data
+	// Output: Log concerning user ID 107 with extra data
 }
 
 func ExampleCopy() {
 	logContainerForUser107 := &bytes.Buffer{} // it can be any io.Writer eq. file
 
 	reactLogger := reactLog.New(os.Stdout) // use os.Stderr for default log functionality
-	reactLogger.AddReaction("USER_107", &reactLog.Copy{logContainerForUser107})
+	reactLogger.AddReaction("user ID 107", &reactLog.Copy{logContainerForUser107})
 
 	logger := log.New(reactLogger, "", 0)
 
-	logger.Println("Log concerning USER_107 with extra data")
+	logger.Println("Log concerning user ID 107 with extra data")
 	logger.Println("INFO dummy log")
 
 	fmt.Println(logContainerForUser107) // in logContainerForUser107 is copy of log just for USER_107
 	// Output:
-	// Log concerning USER_107 with extra data
+	// Log concerning user ID 107 with extra data
 	// INFO dummy log
-	// Log concerning USER_107 with extra data
+	// Log concerning user ID 107 with extra data
 }
