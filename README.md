@@ -12,8 +12,8 @@ reactLogger.AddReaction("user ID 85", &reactLog.Copy{copyBuf})
 
 log.SetOutput(reactLogger)
 
-log.PrintLn("This is regular log message")
-log.PrintLn("This error message concers user ID 85 and will be copied to copyBuf.")
+log.Println("This is regular log message")
+log.Println("This error message concers user ID 85 and will be copied to copyBuf.")
 </pre>
 
 reactLog concept is to filter and add additional functionality to log
