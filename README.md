@@ -4,7 +4,7 @@ Package reactLog is reaction middle-ware for standard golang log.
 [![Build Status](https://travis-ci.org/MatejB/reactLog.svg)](https://travis-ci.org/MatejB/reactLog) [![Code Coverage](http://gocover.io/_badge/github.com/MatejB/reactLog)](http://gocover.io/github.com/MatejB/reactLog) [![Documentation](https://godoc.org/github.com/MatejB/reactLog?status.svg)](https://godoc.org/github.com/MatejB/reactLog)
 
 Basic usage:
-<pre>
+```go
 reactLogger := reactLog.New(os.Stderr)
 
 copyBuf := &bytes.Buffer{}
@@ -14,7 +14,7 @@ log.SetOutput(reactLogger)
 
 log.Println("This is regular log message")
 log.Println("This error message concers user ID 85 and will be copied to copyBuf.")
-</pre>
+```
 
 reactLog concept is to filter and add additional functionality to log
 based on log message content.
